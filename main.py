@@ -1,1 +1,2 @@
 print("Ананас")
+print("Jablochko")
