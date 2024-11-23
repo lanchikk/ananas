@@ -1,383 +1,48 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QListWidget, QLineEdit, QTextEdit, QHBoxLayout, \
-    QVBoxLayout, QInputDialog
-import json
-
-notes = {"Ласкаво просимо": {"text": "Test text",
-                             "tags": ["welcome", "start"]}}
-
-
-def update_database():
-    with open("database.json", "w", encoding="utf-8") as f:
-        json.dump(notes, f)
-
-
-try:
-    with open("database.json", "r", encoding="utf-8") as f:
-        notes = json.load(f)
-except:
-    update_database()
-
-app = QApplication([])
-
-window = QWidget()
-window.setWindowTitle("Розумні замітки")
-
-window.resize(800, 600)
-
-main_layout = QHBoxLayout()
-
-note_text = QTextEdit()
-main_layout.addWidget(note_text)
-
-right_layout = QVBoxLayout()
-
-notes_list: QListWidget | QListWidget = QListWidget()
-right_layout.addWidget(QLabel("Список заміток"))
-right_layout.addWidget(notes_list)
-
-buttons_layout = QHBoxLayout()
-
-create_note_btn = QPushButton("Створити замітку")
-buttons_layout.addWidget(create_note_btn)
-
-delete_note_btn = QPushButton("Видалити замітку")
-buttons_layout.addWidget(delete_note_btn)
-
-right_layout.addLayout(buttons_layout)
-
-save_note_btn = QPushButton("Зберегти замітку")
-right_layout.addWidget(save_note_btn)
-
-tags_list = QListWidget()
-right_layout.addWidget(QLabel("Список тегів"))
-right_layout.addWidget(tags_list)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-window.setLayout(main_layout)
-
-
-def update_note_list():
-    notes_list.clear()
-    notes_list.addItems(notes.keys())
-
-
-def show_note():
-    note_name = notes_list.currentItem().text()
-    text = notes[note_name]["text"]
-    note_text.setText(text)
-    tags = notes[note_name]["tags"]
-    tags_list.clear()
-    tags_list.addItems(tags)
-
-
-def add_note():
-    note_name, ok = QInputDialog.getText(window, "Створення замітки", "Назва замітки:")
-    if ok:
-        notes[note_name] = {"text": "",
-                            "tags": []}
-        update_note_list()
-        update_database()
-
-
-def save_note():
-    note_name = notes_list.currentItem().text()
-    if note_name in notes:
-        text = note_text.toPlainText()
-        notes[note_name]["text"] = text
-        update_database()
-
-
-def del_note():
-    note_name = notes_list.currentItem().text()
-    if note_name in notes:
-        del notes[note_name]
-        update_note_list()
-        note_text.setText("")
-        update_database()
-
-
-def add_tag():
-    tag_name = tag_input.text()
-    if tag_name != "":
-        note_name = notes_list.currentItem().text()
-        if note_name in notes:
-            notes[note_name]["tags"].append(tag_name)
-            tags_list.addItem(tag_name)
-            tag_input.setText("")
-            update_database()
-
-def del_tag():
-    note_name = notes_list.currentItem().text()
-    if note_name in notes:
-        tag_name = tags_list.currentItem().text()
-        notes[note_name]["tags"].remove(tag_name)
-        update_database()
-        tags = notes[note_name]["tags"]
-        tags_list.clear()
-        tags_list.addItems(tags)
-def find_tag():
-    tag_name = tag_input.text()
-    notes_list.clear()
-    for note in notes:
-        if tag_name in notes[note]["tags"]:
-            notes_list.addItem(note)
-notes_list.itemClicked.connect(show_note)
-create_note_btn.clicked.connect(add_note)
-save_note_btn.clicked.connect(save_note)
-delete_note_btn.clicked.connect(del_note)
-add_tag_btn.clicked.connect(add_tag)
-remove_tag_btn.clicked.connect(del_tag)
-search_tag_btn.clicked.connect(find_tag)
-
-update_note_list()
-window.show()
-
-app.exec()
-
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
-
-
-tag_input = QLineEdit()
-right_layout.addWidget(QLabel("Введіть тег"))
-right_layout.addWidget(tag_input)
-
-tag_buttons_layout = QHBoxLayout()
-
-add_tag_btn = QPushButton("Додати до замітки")
-tag_buttons_layout.addWidget(add_tag_btn)
-
-remove_tag_btn = QPushButton("Відкріпити від замітки")
-tag_buttons_layout.addWidget(remove_tag_btn)
-
-right_layout.addLayout(tag_buttons_layout)
-
-search_tag_btn = QPushButton("Шукати замітки по тегу")
-right_layout.addWidget(search_tag_btn)
-
-main_layout.addLayout(right_layout)
+from PIL import Image
+from PIL import ImageFilter
+
+
+class ImageEditor():
+    def __init__(self, filename):
+        self.filename = filename
+        self.original = None
+        self.changed = list()
+
+    def open(self):
+        try:
+            self.original = Image.open(self.filename)
+            self.original.show()
+        except:
+            print("Файл не зайдено!")
+
+    def do_bw(self):
+        pic_gray = self.original.convert('L')
+        self.changed.append(pic_gray)
+        pic_gray.save('gray.jpg')
+
+        pic_gray.save(new_filename)
+
+    # бонус. Обрізати фотографію
+    def do_cropped(self):
+        box = (250, 100, 600, 400)  # ліво, верх, право, низ
+        cropped = self.original.crop(box)
+
+        # бонус. Автоматичний неймінг відредагованих картинок
+        temp_filename = self.filename.split('.')
+        new_filename = temp_filename[0] + str(len(self.changed)) + '.jpg'
+        cropped.save(new_filename)
+
+    def do_left(self):
+        pic_up = original.transpose(Image.ROTATE_90)
+        self.changed.append(pic_up)
+        pic_up.save('rotate.jpg')
+
+MyImage = ImageEditor('original.jpg')
+MyImage.open()
+
+MyImage.do_bw()
+MyImage.do_cropped()
+MyImage.do_left()
+
+for im in MyImage.changed:
+    im.show()
